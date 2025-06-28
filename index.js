@@ -1,4 +1,7 @@
 const http = require('http');
+const { StringDecoder } = require('string_decoder');
+const url = require('url');
+const { handleReqRes } = require('./helper/hendleReqRes')
 
 const app = {}
 
@@ -15,9 +18,7 @@ app.createServer = () => {
 }
 
 // handle request response
-app.handleReqRes = (req, res) => {
-    res.end('Hello World');
-}
+app.handleReqRes = handleReqRes;
 
 // start the server
 app.createServer()
