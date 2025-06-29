@@ -1,6 +1,8 @@
 
 const { StringDecoder } = require('string_decoder')
 const url = require('url');
+const routes  = require('../route')
+const { notFoundHandler } = require('../handler/routeHandler/notFoundHandler')
 
 const handler = {}
 
@@ -12,8 +14,29 @@ handler.handleReqRes = (req, res) => {
     const queryStringObject = parsedUrl.query
     const headers = req.headers;
 
+    const reqProperties = {
+        parsedUrl,
+        path,
+        trimmedPath,
+        method,
+        queryStringObject,
+        headers
+    }
+
     const decoder = new StringDecoder('utf-8')
     let realData = ''
+
+    const chosenHandelar = routes[trimmedPath] ? routes[trimmedPath] : notFoundHandler
+
+    chosenHandelar(reqProperties, (statusCode, playLoad) => {
+        statusCode = typeof (statusCode) === 'number' ? statusCode : 500
+        playLoad = typeof (playLoad) === 'object' ? playLoad : {}
+
+        const playLoadString = JSON.stringify(playLoad)
+
+        res.writeHead(statusCode)
+        res.end(playLoadString)
+    })
 
     req.on('data', (buffer) => {
         realData += decoder.write(buffer)
@@ -21,7 +44,6 @@ handler.handleReqRes = (req, res) => {
 
     req.on('end', () => {
         realData += decoder.end()
-        console.log(realData);
         res.end('Hello World');
     })
 }

@@ -1,8 +1,8 @@
 
 const { sampleHandler } = require('./handler/routeHandler/sampleHandler')
 
-const route = {
+const routes = {
     sample: sampleHandler,
 }
 
-module.exports = route
+module.exports = routes
