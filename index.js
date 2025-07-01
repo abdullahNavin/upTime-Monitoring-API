@@ -7,9 +7,6 @@ const data = require('./lib/data')
 
 const app = {}
 
-data.delete('test','newFile',(err)=>{
-    console.log(err);
-})
 
 // create servr
 app.createServer = () => {
