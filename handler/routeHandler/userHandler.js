@@ -95,7 +95,7 @@ handler._users.put = (reqProperties, callback) => {
 
     const password = typeof (reqProperties.body.password) === 'string' && reqProperties.body.password.trim().length > 0 ? reqProperties.body.password : false
 
-    console.log(phone,firstName);
+    console.log(phone, firstName);
     if (phone) {
         if (firstName || lastName || phone || password) {
             data.read('users', phone, (error, uData) => {
@@ -137,8 +137,29 @@ handler._users.put = (reqProperties, callback) => {
     }
 }
 
-handler._users.delet = (reqProperties, callback) => {
+handler._users.delete = (reqProperties, callback) => {
+    const phone = typeof (reqProperties.body.phone) === 'string' && reqProperties.body.phone.trim().length === 11 ? reqProperties.body.phone : false
 
+    if (phone) {
+        data.read('users', phone, (error, userData) => {
+            if (!error && userData) {
+                data.delete('users', phone, (err) => {
+                    if (!err) {
+                        callback(200, {message:'user deleted successfully' })
+                    }
+                    else {
+                        callback(500, { error: 'There is a server side error' })
+                    }
+                })
+            }
+            else {
+                callback(400, { error: 'There is a problem in your request' })
+            }
+        })
+    }
+    else {
+        callback(400, { error: 'There is a problem in your request' })
+    }
 }
 
 module.exports = handler
