@@ -138,7 +138,7 @@ handler._users.put = (reqProperties, callback) => {
 }
 
 handler._users.delete = (reqProperties, callback) => {
-    const phone = typeof (reqProperties.body.phone) === 'string' && reqProperties.body.phone.trim().length === 11 ? reqProperties.body.phone : false
+    const phone = typeof (reqProperties.queryStringObject.phone) === 'string' && reqProperties.queryStringObject.phone.trim().length === 11 ? reqProperties.queryStringObject.phone : false
 
     if (phone) {
         data.read('users', phone, (error, userData) => {

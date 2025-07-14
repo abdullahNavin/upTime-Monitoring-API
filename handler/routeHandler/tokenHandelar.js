@@ -37,7 +37,7 @@ handler._token.post = (reqProperties, callback) => {
 
                 data.create('tokens', tokenId, tokenObject, (err) => {
                     if (!err) {
-                        callback(200,  tokenObject )
+                        callback(200, tokenObject)
                     }
                     else {
                         callback(500, {
@@ -60,14 +60,87 @@ handler._token.post = (reqProperties, callback) => {
     }
 
 }
-handler._token.get = (reqProperties, callback) => {
 
+handler._token.get = (reqProperties, callback) => {
+    const id = typeof reqProperties.queryStringObject.id === 'string' && reqProperties.queryStringObject.id.trim().length === 20 ? reqProperties.queryStringObject.id : false
+
+    if (id) {
+        data.read('tokens', id, (error, tokenData) => {
+            const token = parseJson(tokenData)
+            if (!error && tokenData) {
+                callback(200, token)
+            }
+            else {
+                callback(404, { error: 'token was not found' })
+            }
+        })
+    }
+    else {
+        callback(404, { error: 'token was not found' })
+    }
 }
+
 handler._token.put = (reqProperties, callback) => {
 
-}
-handler._token.delete = (reqProperties, callback) => {
+    const id = typeof reqProperties.body.id === 'string' && reqProperties.body.id.trim().length === 20 ? reqProperties.body.id : false;
 
+    const extend = typeof reqProperties.body.extend === 'boolean' && reqProperties.body.extend === true ? true : false
+
+    if (id && extend) {
+        data.read('tokens', id, (error, tokenData) => {
+            if (!error && tokenData) {
+                let tokenObject = parseJson(tokenData)
+                if (tokenObject.expires > Date.now()) {
+                    tokenObject.expires = Date.now() + 60 * 60 * 1000
+
+                    // store the tokenObject
+
+                    data.update('tokens', id, tokenObject, (err2) => {
+                        if (!err2) {
+                            callback(200)
+                        }
+                        else {
+                            callback(400, { error: 'there is a server side' })
+                        }
+                    })
+                }
+                else {
+                    callback(400, { error: 'token already expired' })
+                }
+            }
+            else {
+                callback(400, { error: 'There is problem in your request' })
+            }
+        })
+    }
+    else {
+        callback(400, { error: 'There is problem in your request' })
+    }
+}
+
+handler._token.delete = (reqProperties, callback) => {
+    const id = typeof (reqProperties.queryStringObject.id) === 'string' && reqProperties.queryStringObject.id.trim().length === 20 ? reqProperties.queryStringObject.id : false
+
+    if (id) {
+        data.read('tokens', id, (error, tokenData) => {
+            if (!error && tokenData) {
+                data.delete('tokens', id, (err) => {
+                    if (!err) {
+                        callback(200, { message: 'token deleted successfully' })
+                    }
+                    else {
+                        callback(500, { error: 'There is a server side error' })
+                    }
+                })
+            }
+            else {
+                callback(400, { error: 'There is a problem in your request' })
+            }
+        })
+    }
+    else {
+        callback(400, { error: 'There is a problem in your request' })
+    }
 }
 
 module.exports = handler
