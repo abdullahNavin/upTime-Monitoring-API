@@ -97,7 +97,7 @@ handler._token.put = (reqProperties, callback) => {
 
                     data.update('tokens', id, tokenObject, (err2) => {
                         if (!err2) {
-                            callback(200)
+                            callback(200,{message:'token updated successfully'})
                         }
                         else {
                             callback(400, { error: 'there is a server side' })
